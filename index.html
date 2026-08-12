@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pay.com — V2 Prototype</title>
+<style>
+:root{--ink:#101828;--muted:#667085;--line:#e4e7ec;--bg:#f5f7fb;--brand:#175cd3;--soft:#eff4ff;--green:#027a48;--greenbg:#ecfdf3;--amber:#b54708;--amberbg:#fffaeb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink)}
+.app{max-width:440px;min-height:100vh;margin:auto;background:#fff;box-shadow:0 0 35px #00000012}
+header{height:68px;padding:0 20px;border-bottom:1px solid #eef0f3;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:5}
+.logo{font-size:25px;font-weight:900;letter-spacing:-1.2px}.logo i{font-style:normal;color:var(--brand)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;font-weight:800}
+main{padding:18px 20px 88px}.screen{display:none}.screen.active{display:block}
+h1{font-size:29px;line-height:1.08;letter-spacing:-1px;margin:20px 0 8px}h2{font-size:20px;margin:24px 0 10px}h3{font-size:16px;margin:0 0 7px}p{color:var(--muted);line-height:1.48;margin:7px 0}
+button{width:100%;border:0;border-radius:13px;background:var(--brand);color:#fff;padding:14px 16px;font-size:15px;font-weight:800;margin-top:10px;cursor:pointer}
+button.secondary{background:var(--soft);color:var(--brand)}button.ghost{background:#fff;color:#344054;border:1px solid var(--line)}button.link{width:auto;background:none;color:var(--brand);padding:4px;margin:0}
+.back{width:auto;background:none;color:#344054;padding:4px;margin:0 0 4px}
+.hero{padding:26px 0 12px}.eyebrow{font-size:11px;letter-spacing:1.3px;font-weight:850;color:var(--brand)}
+.hero h1{font-size:37px}.hero-card{background:#101828;color:#fff;border-radius:22px;padding:22px;margin-top:22px}.hero-card p{color:#cfd4dc}
+.card{border:1px solid var(--line);border-radius:16px;padding:16px;margin:11px 0;background:#fff}
+.soft-card{background:var(--soft);border:0}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.small{font-size:12px;color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}
+.country{display:flex;align-items:center;gap:14px;padding:17px;font-weight:800;font-size:17px}.flag{font-size:29px}
+.amount{font-size:29px;font-weight:900;letter-spacing:-1px;margin:5px 0}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}
+.status{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:850;background:var(--amberbg);color:var(--amber)}.success{background:var(--greenbg);color:var(--green)}.blue{background:var(--soft);color:var(--brand)}
+input,select{width:100%;padding:14px;border:1px solid #d0d5dd;border-radius:12px;font-size:15px;margin:6px 0 14px;background:#fff}
+label{font-size:13px;font-weight:750}
+.detail{background:#f8fafc;border-radius:14px;padding:15px;margin-top:12px}.detail p{margin:9px 0;color:#344054}
+.notice{padding:13px 14px;background:#fffaeb;border-radius:13px;color:#93370d;font-size:13px;line-height:1.45}
+.timeline{margin:15px 0}.step{display:flex;gap:12px;padding:12px 0}.dot{width:25px;height:25px;border-radius:50%;background:#eaecf0;display:grid;place-items:center;font-size:12px;flex:none}.done .dot{background:var(--greenbg);color:var(--green)}.current .dot{background:var(--soft);color:var(--brand)}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(440px,100%);height:67px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:10}.bottom button{background:#fff;color:#667085;border-radius:0;margin:0;padding:8px 4px;font-size:11px}.bottom button.active{color:var(--brand)}
+.hide{display:none!important}.admin .bottom{display:none}.admin header{background:#101828;color:#fff;border:0}.admin .logo i{color:#84adff}.admin .avatar{background:#344054;color:#fff}
+.admin main{padding-bottom:30px}.metric{padding:14px;border:1px solid var(--line);border-radius:15px}.metric .n{font-size:24px;font-weight:900;margin-top:4px}
+.table-card{overflow:hidden;padding:0}.txrow{padding:15px;border-bottom:1px solid var(--line)}.txrow:last-child{border-bottom:0}
+.file{border:1px dashed #98a2b3;border-radius:13px;padding:22px;text-align:center;color:var(--muted);margin:10px 0}
+@media(min-width:700px){.app{margin:30px auto;border-radius:22px;overflow:hidden}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header><div class="logo">Pay<i>.com</i></div><div class="avatar" onclick="go('profile')">T</div></header>
+<main>
+
+<section id="landing" class="screen active">
+<div class="hero">
+<div class="eyebrow">INTERNATIONAL RECEIVING</div>
+<h1>Receive money from abroad. Simply.</h1>
+<p>One simple place to receive international payments into your Nigerian bank account.</p>
+<div class="hero-card"><div class="eyebrow" style="color:#98b9ff">SUPPORTED CORRIDORS</div><h2 style="color:#fff">USA · Japan · Taiwan</h2><p>Start a transaction, share your receiving details, track the payment and complete your payout.</p></div>
+<button onclick="go('login')">Get started</button>
+<button class="secondary" onclick="go('login')">Log in</button>
+</div>
+</section>
+
+<section id="login" class="screen">
+<button class="back" onclick="go('landing')">← Back</button><h1>Welcome back</h1><p>Use your phone number to continue.</p>
+<label>Phone number</label><input placeholder="+234 801 234 5678">
+<label>PIN</label><input type="password" placeholder="••••">
+<button onclick="go('home')">Continue</button>
+<p class="small" style="text-align:center;margin-top:15px">Prototype mode — no real money is moved.</p>
+</section>
+
+<section id="home" class="screen">
+<div class="row"><div><div class="small">Good afternoon</div><h1 style="margin-top:3px">Thomas 👋</h1></div><span class="status success">Verified</span></div>
+<button onclick="go('countries')">＋ Receive Money</button>
+<div class="card soft-card"><div class="small">ACTIVE TRANSACTION</div><div class="row"><div><h3>🇯🇵 Japan</h3><div class="amount">¥250,000</div></div><span class="status">Waiting</span></div><button class="secondary" onclick="go('transaction')">View transaction</button></div>
+<h2>Recent activity</h2>
+<div class="card" onclick="go('completed')"><div class="row"><div><b>🇺🇸 USA</b><div class="small">Yesterday · PAY-US-194832</div></div><span class="status success">Completed</span></div><div class="amount">$1,000</div></div>
+<div class="card"><div class="row"><div><b>🇹🇼 Taiwan</b><div class="small">Aug 08 · PAY-TW-738291</div></div><span class="status success">Completed</span></div><div class="amount">NT$50,000</div></div>
+</section>
+
+<section id="countries" class="screen">
+<button class="back" onclick="go('home')">← Back</button><h1>Receive money</h1><p>Where is the sender located?</p>
+<div class="card country" onclick="choose('Japan','¥','JP','🇯🇵')"><span class="flag">🇯🇵</span>Japan <span style="margin-left:auto">›</span></div>
+<div class="card country" onclick="choose('United States','$','US','🇺🇸')"><span class="flag">🇺🇸</span>United States <span style="margin-left:auto">›</span></div>
+<div class="card country" onclick="choose('Taiwan','NT$','TW','🇹🇼')"><span class="flag">🇹🇼</span>Taiwan <span style="margin-left:auto">›</span></div>
+</section>
+
+<section id="amount" class="screen">
+<button class="back" onclick="go('countries')">← Back</button><h1>Receive from <span id="cname"></span> <span id="cflag"></span></h1>
+<p>Tell us the amount you expect so we can create a transaction.</p>
+<label>Expected amount</label><input id="expected" inputmode="decimal" placeholder="250000">
+<button onclick="createTx()">Create transaction</button>
+</section>
+
+<section id="details" class="screen">
+<div class="eyebrow">TRANSACTION CREATED</div><h1>Your receiving details</h1><p>Share these details with the person sending your money.</p>
+<div class="detail"><div class="small">TRANSACTION ID</div><b class="mono" id="txid">PAY-JP-000000</b><hr style="border:0;border-top:1px solid #e4e7ec;margin:13px 0"><p><b>Bank</b><br>Pay.com partner bank</p><p><b>Account name</b><br>PAY.COM RECEIVING</p><p><b>Account number</b><br><span class="mono" id="acct">00000000</span></p><p><b>Reference</b><br><span class="mono" id="ref">PAYJP000000</span></p></div>
+<div class="notice">Only send the receiving details generated for this transaction. Do not reuse an old transaction account/reference.</div>
+<button onclick="share()">Share details on WhatsApp</button><button class="secondary" onclick="go('transaction')">Continue to transaction</button>
+</section>
+
+<section id="transaction" class="screen">
+<button class="back" onclick="go('home')">← Dashboard</button><div class="eyebrow">TRANSACTION</div><h1 id="txcountry">Japan 🇯🇵</h1>
+<div class="card"><div class="small">EXPECTED AMOUNT</div><div class="amount" id="txamount">¥250,000</div><div class="mono small" id="txnumber">PAY-JP-847291</div></div>
+<div class="timeline"><div class="step current"><div class="dot">1</div><div><b>Receiving details created</b><div class="small">Share them with your sender.</div></div></div><div class="step current"><div class="dot">2</div><div><b>Waiting for payment</b><div class="small">Upload the sender receipt after payment.</div></div></div><div class="step"><div class="dot">3</div><div><b>Payment verified</b><div class="small">Pay.com confirms the actual incoming funds.</div></div></div><div class="step"><div class="dot">4</div><div><b>Nigerian payout</b><div class="small">Money is sent to your Nigerian bank account.</div></div></div></div>
+<button onclick="go('upload')">Upload payment receipt</button><button class="secondary" onclick="go('support')">WhatsApp Support</button>
+</section>
+
+<section id="upload" class="screen">
+<button class="back" onclick="go('transaction')">← Back</button><h1>Upload receipt</h1><p>Upload the receipt provided by the sender.</p>
+<div class="file">📎<br><b>Select receipt</b><br><span class="small">JPG, PNG or PDF</span><input type="file" accept="image/*,.pdf"></div>
+<div class="notice">A receipt does not prove that funds have arrived. Pay.com confirms the transaction only after the incoming payment is verified.</div>
+<button onclick="go('verification')">Submit receipt</button>
+</section>
+
+<section id="verification" class="screen">
+<div class="eyebrow">VERIFICATION</div><h1>We're checking your payment</h1><p>Your receipt has been submitted successfully.</p>
+<div class="card"><div class="row"><b>Receipt</b><span class="status success">Uploaded</span></div><div class="row" style="margin-top:12px"><b>Incoming funds</b><span class="status">Pending</span></div></div>
+<button onclick="receive()">Simulate payment received</button><p class="small">Demo control: simulates the partner confirming the funds.</p>
+</section>
+
+<section id="received" class="screen">
+<div style="font-size:48px;margin-top:20px">✓</div><h1>Payment received</h1><p>The international payment has been verified.</p>
+<div class="card"><div class="small">RECEIVED</div><div class="amount" id="receivedAmount">¥250,000</div><b id="receivedCountry">Japan 🇯🇵 → Nigeria 🇳🇬</b><p class="mono small" id="receivedTx"></p></div>
+<button onclick="go('bank')">Receive my money</button><button class="secondary" onclick="go('support')">Need help?</button>
+</section>
+
+<section id="bank" class="screen">
+<button class="back" onclick="go('received')">← Back</button><h1>Where should we send it?</h1><p>Enter the Nigerian account that should receive your payout.</p>
+<label>Bank</label><select><option>Select your bank</option><option>GTBank</option><option>Access Bank</option><option>UBA</option><option>Zenith Bank</option><option>First Bank</option></select>
+<label>Account number</label><input inputmode="numeric" placeholder="0123456789"><label>Account name</label><input placeholder="Account holder name">
+<button onclick="go('confirm')">Continue</button>
+</section>
+
+<section id="confirm" class="screen">
+<button class="back" onclick="go('bank')">← Back</button><h1>Review your payout</h1>
+<div class="card"><div class="row"><span>International payment</span><b id="confirmIntl">¥250,000</b></div><div class="row" style="margin-top:12px"><span>Pay.com fee</span><b>₦XX,XXX</b></div><hr style="border:0;border-top:1px solid #e4e7ec;margin:15px 0"><div class="small">YOU RECEIVE</div><div class="amount">₦XXX,XXX</div></div>
+<div class="card"><b>GTBank •••• 4821</b><div class="small">Thomas Ebenezer</div></div>
+<button onclick="go('processing')">Confirm payout</button>
+</section>
+
+<section id="processing" class="screen">
+<div class="eyebrow">PAYOUT</div><h1>Your money is on the way</h1>
+<div class="timeline"><div class="step done"><div class="dot">✓</div><div><b>International payment received</b></div></div><div class="step current"><div class="dot">2</div><div><b>Nigerian payout processing</b><div class="small">Your payout is being prepared.</div></div></div><div class="step"><div class="dot">3</div><div><b>Money deposited</b></div></div></div>
+<button onclick="go('completed')">Simulate completed payout</button>
+</section>
+
+<section id="completed" class="screen">
+<div style="font-size:48px;margin-top:20px">🎉</div><h1>Money received</h1>
+<div class="card"><div class="amount">₦XXX,XXX</div><p>Deposited into <b>GTBank ••••4821</b></p><span class="status success">Completed</span></div>
+<div class="card"><div class="small">TRANSACTION</div><b class="mono">PAY-JP-847291</b><p>Japan 🇯🇵 → Nigeria 🇳🇬</p></div>
+<button onclick="go('home')">Back to dashboard</button><button class="secondary" onclick="go('support')">Contact support</button>
+</section>
+
+<section id="support" class="screen">
+<button class="back" onclick="go('transaction')">← Back</button><div class="eyebrow">CUSTOMER SUPPORT</div><h1>Your transaction support</h1>
+<div class="card"><b>Transaction</b><div class="mono" id="supportTx">PAY-JP-847291</div><p>Support can see the transaction linked to this conversation.</p></div>
+<button onclick="openChat('WhatsApp')">Open WhatsApp</button><button class="secondary" onclick="openChat('Telegram')">Open Telegram</button>
+</section>
+
+<section id="history" class="screen">
+<h1>Transactions</h1><p>Your complete receiving history.</p>
+<div class="card"><div class="row"><b>🇯🇵 Japan</b><span class="status">Waiting</span></div><div class="amount">¥250,000</div><div class="small">PAY-JP-847291</div></div>
+<div class="card"><div class="row"><b>🇺🇸 USA</b><span class="status success">Completed</span></div><div class="amount">$1,000</div><div class="small">PAY-US-194832</div></div>
+<div class="card"><div class="row"><b>🇹🇼 Taiwan</b><span class="status success">Completed</span></div><div class="amount">NT$50,000</div><div class="small">PAY-TW-738291</div></div>
+</section>
+
+<section id="profile" class="screen">
+<h1>Profile</h1><div class="card"><div class="row"><div><b>Thomas Ebenezer</b><div class="small">+234 801 234 5678</div></div><span class="status success">Verified</span></div></div>
+<div class="card"><h3>Security</h3><p>PIN & password</p><p>Two-factor authentication</p><p>Verified phone number</p></div>
+<div class="card"><h3>Bank accounts</h3><p>GTBank ••••4821</p></div>
+<button class="ghost" onclick="go('landing')">Log out</button><button class="secondary" onclick="go('admin')">Open demo admin</button>
+</section>
+
+<section id="admin" class="screen">
+<div class="eyebrow">PAY.COM ADMIN</div><h1>Operations</h1><p>Demo control centre for the prototype.</p>
+<div class="card"><div class="row"><div class="metric"><div class="small">Transactions</div><div class="n">24</div></div><div class="metric"><div class="small">Pending</div><div class="n">7</div></div></div><div class="row" style="margin-top:10px"><div class="metric"><div class="small">Received</div><div class="n">12</div></div><div class="metric"><div class="small">Completed</div><div class="n">5</div></div></div></div>
+<h2>Transactions</h2><div class="card table-card">
+<div class="txrow" onclick="adminTx('PAY-JP-847291','Japan','¥250,000','Pending verification')"><div class="row"><b>PAY-JP-847291</b><span class="status">Pending</span></div><div class="small">🇯🇵 Japan · Thomas</div></div>
+<div class="txrow" onclick="adminTx('PAY-US-194832','USA','$1,000','Completed')"><div class="row"><b>PAY-US-194832</b><span class="status success">Completed</span></div><div class="small">🇺🇸 USA · Customer</div></div>
+<div class="txrow" onclick="adminTx('PAY-TW-738291','Taiwan','NT$50,000','Processing')"><div class="row"><b>PAY-TW-738291</b><span class="status blue">Processing</span></div><div class="small">🇹🇼 Taiwan · Customer</div></div>
+</div>
+<button class="secondary" onclick="go('home')">Back to customer view</button>
+</section>
+
+<section id="admintx" class="screen">
+<button class="back" onclick="go('admin')">← Admin</button><div class="eyebrow">TRANSACTION REVIEW</div><h1 id="atxid">PAY-JP-847291</h1>
+<div class="card"><div class="row"><b id="atxcountry">Japan</b><span class="status" id="atxstatus">Pending verification</span></div><div class="amount" id="atxamount">¥250,000</div><p>Customer: Thomas Ebenezer</p><p>Phone: +234 801 234 5678</p></div>
+<div class="card"><h3>Receipt</h3><div class="file">📄 Sender payment receipt<br><span class="small">Prototype document preview</span></div></div>
+<div class="card"><h3>Controls</h3><button onclick="alert('Demo: transaction marked as payment received.')">Confirm funds received</button><button class="secondary" onclick="alert('Demo: payout approved.')">Approve payout</button><button class="ghost" onclick="alert('Demo: transaction placed on hold.')">Place on hold</button></div>
+</section>
+
+</main>
+<div class="bottom">
+<button onclick="go('home')">⌂<br>Home</button><button onclick="go('countries')">＋<br>Receive</button><button onclick="go('history')">↕<br>Transactions</button><button onclick="go('profile')">◯<br>Profile</button>
+</div>
+</div>
+
+<script>
+let country='Japan',symbol='¥',code='JP',flag='🇯🇵',tx='PAY-JP-847291',expected='250000';
+function go(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.getElementById('app').classList.toggle('admin',id==='admin'||id==='admintx');
+window.scrollTo(0,0);
+}
+function choose(c,s,k,f){country=c;symbol=s;code=k;flag=f;document.getElementById('cname').textContent=c;document.getElementById('cflag').textContent=f;go('amount')}
+function createTx(){
+expected=document.getElementById('expected').value||'250000';
+tx='PAY-'+code+'-'+Math.floor(100000+Math.random()*899999);
+document.getElementById('txid').textContent=tx;document.getElementById('ref').textContent=tx.replaceAll('-','');
+document.getElementById('acct').textContent=Math.floor(10000000+Math.random()*89999999);
+document.getElementById('txnumber').textContent=tx;document.getElementById('supportTx').textContent=tx;
+document.getElementById('txcountry').textContent=country+' '+flag;document.getElementById('txamount').textContent=symbol+Number(expected).toLocaleString();
+document.getElementById('receivedAmount').textContent=symbol+Number(expected).toLocaleString();
+document.getElementById('receivedCountry').textContent=country+' '+flag+' → Nigeria 🇳🇬';
+document.getElementById('receivedTx').textContent=tx;document.getElementById('confirmIntl').textContent=symbol+Number(expected).toLocaleString();
+go('details')
+}
+function receive(){go('received')}
+function share(){alert('Demo: WhatsApp would open with the transaction ID and receiving details.')}
+function openChat(x){alert('Demo: '+x+' would open a verified support conversation linked to '+tx+'.')}
+function adminTx(id,c,a,s){document.getElementById('atxid').textContent=id;document.getElementById('atxcountry').textContent=c;document.getElementById('atxamount').textContent=a;document.getElementById('atxstatus').textContent=s;go('admintx')}
+</script>
+</body>
+</html>
