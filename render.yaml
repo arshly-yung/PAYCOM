@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: paycom-phase2
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: paycom-db
+          property: connectionString
+      - key: ADMIN_PHONE
+        sync: false
+      - key: ADMIN_PIN
+        sync: false
+
+databases:
+  - name: paycom-db
+    databaseName: paycom
+    user: paycom
