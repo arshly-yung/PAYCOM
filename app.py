@@ -6,6 +6,7 @@ import smtplib
 import secrets
 import hashlib
 import base64
+import requests
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from datetime import datetime, timezone, timedelta
 from email.message import EmailMessage
@@ -294,6 +295,29 @@ def send_verification_email(user, code):
     if os.getenv("EMAIL_TEST_MODE", "0") == "1":
         app.logger.warning("EMAIL_TEST_MODE code for %s: %s", user.email, code)
         return
+        api_key = os.getenv("RESEND_API_KEY","").strip()
+        if not api_key:
+            raise RuntimeError("RESEND_API_KEY IS not configured.")
+            sender = os.getenv("RESEND_FROM","onboarding@resend.dev").strip()
+            payload = {
+                "from": sender,
+                "to": [user.email],
+                "subject": "Your pay.com verification code",
+                "text": f"Your pay.com verification code is {code}. The code expires in 10 minutes."
+            }
+            response = request.post(
+                "https://api.resend.com/emails", headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "content-Type": "application/json",
+                },
+                json=payload,
+                timeout=20,
+            )
+            if not response.ok:
+            raise RuntimeError(f"Resend email failed: {response.status_code}
+                {response.text}")
+
+    return
 
     host = os.getenv("SMTP_HOST", "").strip()
     username = os.getenv("SMTP_USER", "").strip()
