@@ -313,11 +313,8 @@ def send_verification_email(user, code):
                 json=payload,
                 timeout=20,
             )
-            if not response.ok:
-            raise RuntimeError(f"Resend email failed: {response.status_code}
-                {response.text}")
-
-    return
+         if not response.ok: raise  RuntimeError("Resend email failed")
+        return
 
     host = os.getenv("SMTP_HOST", "").strip()
     username = os.getenv("SMTP_USER", "").strip()
