@@ -1,1 +1,8 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pay.com</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}"></head><body><div class="shell"><header class="top"><a class="brand" href="{{url_for('index')}}">Pay<span>.com</span></a></header><main>{% with messages=get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<div class="alert {{c}}">{{m}}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</main>{% if current_user.is_authenticated and current_user.role!='admin' %}<nav class="bottom"><a href="{{url_for('dashboard')}}">Home</a><a href="{{url_for('receive')}}">Receive</a><a href="{{url_for('dashboard')}}">Transactions</a><a href="{{url_for('logout')}}">Logout</a></nav>{% endif %}</div></body></html>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pay.com</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}"></head>
+<body><div class="shell"><header class="top"><a class="brand" href="{{url_for('index')}}">Pay<span>.com</span></a>
+{% if current_user.is_authenticated and current_user.role!='admin' %}{% set p=get_profile(current_user) %}
+<a href="{{url_for('profile')}}"><img class="avatar-img" src="{{url_for('static',filename='avatars/'+p.avatar_key+'.svg')}}"></a>{% endif %}</header>
+<main>{% with messages=get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<div class="alert {{c}}">{{m}}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</main>
+{% if current_user.is_authenticated and current_user.role!='admin' %}<nav class="bottom"><a href="{{url_for('dashboard')}}">Home</a><a href="{{url_for('receive')}}">Receive</a><a href="{{url_for('dashboard')}}">Transactions</a><a href="{{url_for('profile')}}">Profile</a></nav>{% endif %}
+</div></body></html>

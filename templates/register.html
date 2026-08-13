@@ -1,1 +1,5 @@
-{% extends 'base.html' %}{% block content %}<h1>Create account</h1><form method="post"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><label>Full name<input name="full_name" required></label><label>Phone<input name="phone" required></label><label>Email<input type="email" name="email"></label><label>PIN<input type="password" name="pin" minlength="4" required></label><button>Create account</button></form>{% endblock %}
+{% extends 'base.html' %}{% block content %}<h1>Create account</h1><p>Your email is required so Pay.com can verify your account.</p>
+<form method="post"><input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<label>Full name<input name="full_name" required></label><label>Phone<input name="phone" required></label>
+<label>Email<input type="email" name="email" required></label><label>PIN<input type="password" name="pin" inputmode="numeric" minlength="4" required></label>
+<button>Create account</button></form>{% endblock %}

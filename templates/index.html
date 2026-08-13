@@ -1,1 +1,7 @@
-{% extends 'base.html' %}{% block content %}<h1>Receive money from abroad. Securely.</h1><p>USA · Japan · Taiwan</p>{% if current_user.is_authenticated %}<a class="btn" href="{{url_for('dashboard')}}">Open dashboard</a>{% else %}<a class="btn" href="{{url_for('login')}}">Sign in</a><a class="btn" href="{{url_for('register')}}">Create account</a>{% endif %}{% endblock %}
+{% extends 'base.html' %}{% block content %}
+<div class="motion-hero"><div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div>
+<div class="eyebrow">INTERNATIONAL RECEIVING</div><div class="motion-logo">Pay<span>.com</span></div>
+<p class="motion-sub">Receive money from abroad with transaction-specific receiving details, verification and transparent payout tracking.</p>
+<div class="motion-card"><div class="mini">SUPPORTED</div><b>JP · US · TW</b><div class="mini">→ Nigeria</div></div></div>
+{% if current_user.is_authenticated %}<a class="btn" href="{{url_for('dashboard')}}">Open Pay.com</a>{% else %}<a class="btn" href="{{url_for('login')}}">Sign in</a><a class="btn secondary" href="{{url_for('register')}}">Create account</a>{% endif %}
+{% endblock %}
