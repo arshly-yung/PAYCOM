@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}<div class="eyebrow">EMAIL VERIFICATION</div><h1>Check your email</h1>
+<p>Enter the 6-digit code sent to <b>{{current_user.email}}</b>.</p>
+<form method="post"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><label>Verification code<input name="code" inputmode="numeric" maxlength="6" required></label><button>Verify email</button></form>
+<form method="post" action="{{url_for('resend_email_code')}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="secondary">Send a new code</button></form>{% endblock %}

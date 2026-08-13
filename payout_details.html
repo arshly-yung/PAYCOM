@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}<div class="eyebrow">NIGERIAN PAYOUT</div><h1>Where should we send your money?</h1><p>Enter the Nigerian account you want Pay.com to pay after the international payment is verified.</p>
+<form method="post"><input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<label>Bank name<input name="bank_name" value="{{payout.bank_name if payout else ''}}" required></label>
+<label>10-digit account number<input name="account_number" inputmode="numeric" maxlength="10" value="{{payout.account_number if payout else ''}}" required></label>
+<label>Account name<input name="account_name" value="{{payout.account_name if payout else ''}}" required></label><button>Submit payout account</button></form>{% endblock %}

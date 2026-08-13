@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block content %}<div class="eyebrow">HIGH-VALUE ACCESS</div><h1>Identity verification</h1><p>Approved identity is required for Japan transactions from ¥510,000 to ¥1,000,000.</p>
+<div class="card"><b>Current status</b><p><span class="status {{'good' if profile.identity_status=='APPROVED' else 'bad' if profile.identity_status=='DECLINED' else ''}}">{{profile.identity_status.replace('_',' ')}}</span></p></div>
+<form method="post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<label>ID type<select name="document_type"><option value="NIN">NIN</option><option value="DRIVERS_LICENSE">Driver's License</option></select></label>
+<label>ID number<input name="id_number" required></label><label>Document image / PDF<input type="file" name="document" accept=".jpg,.jpeg,.png,.pdf" required></label>
+<button>Submit for admin review</button></form><div class="notice">Identity documents are restricted to administrators and stored encrypted by the application.</div>{% endblock %}
