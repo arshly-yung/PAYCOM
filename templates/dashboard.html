@@ -1,8 +1,70 @@
-{% extends 'base.html' %}{% block content %}
-<div class="row"><div><div class="eyebrow">ACCOUNT</div><h1>Hello, {{current_user.full_name.split()[0]}}</h1></div><img class="avatar-img" style="width:58px;height:58px" src="{{url_for('static',filename='avatars/'+profile.avatar_key+'.svg')}}"></div>
-<div class="card"><div class="row"><b>Pay.com approval</b><span class="status {{'good' if current_user.is_verified else ''}}">{{'Approved' if current_user.is_verified else 'Pending'}}</span></div>
-<div class="row" style="margin-top:12px"><b>Email</b>{% if profile.email_verified %}<span class="badge-verified">Verified</span>{% else %}<a class="status blue" href="{{url_for('verify_email')}}">Verify email</a>{% endif %}</div>
-<div class="row" style="margin-top:12px"><b>ID verification</b><span class="status {{'good' if profile.identity_status=='APPROVED' else 'bad' if profile.identity_status=='DECLINED' else ''}}">{{profile.identity_status.replace('_',' ')}}</span></div></div>
-{% if current_user.is_verified and profile.email_verified %}<a class="btn" href="{{url_for('receive')}}">+ Receive Money</a>{% endif %}
-<h2>Transactions</h2>{% for t in txns %}<a href="{{url_for('transaction_detail',tx_id=t.id)}}"><div class="card"><div class="row"><b>{{t.country}}</b><span class="status {{'good' if t.status=='COMPLETED' else ''}}">{{t.status.replace('_',' ')}}</span></div><div class="amount">{{t.currency}} {{'{:,.2f}'.format(t.expected_amount)}}</div><div class="mono">{{t.reference}}</div></div></a>{% else %}<div class="card"><p>No transactions yet.</p></div>{% endfor %}
+{% extends 'base.html' %}
+{% block title %}Dashboard — PAYCOM{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+  <aside class="side-nav">
+    <div class="side-brand"><img src="{{ url_for('static', filename='img/paycom-logo.png') }}"><b>PAYCOM</b></div>
+    <a class="active" href="{{ url_for('dashboard') }}">▦ Dashboard</a>
+    <a href="{{ url_for('receive') }}">↗ Receive money</a>
+    <a href="#transactions">≡ Transactions</a>
+    <a href="{{ url_for('verify_email') }}">✓ Verification</a>
+    <a href="{{ url_for('identity') }}">⌾ Identity</a>
+    <a href="{{ url_for('profile') }}">⚙ Profile</a>
+  </aside>
+
+  <section class="dashboard-main">
+    <div class="welcome">
+      <div><div class="section-kicker">CUSTOMER DASHBOARD</div><h1>Welcome back, {{ current_user.full_name.split()[0] }} 👋</h1><p>Here’s what’s happening with your PAYCOM account.</p></div>
+      <img class="profile-big" src="{{ url_for('static', filename='avatars/'+profile.avatar_key+'.svg') }}">
+    </div>
+
+    <div class="dash-grid">
+      <div class="gradient-card">
+        <small>ACCOUNT STATUS</small>
+        <h2>{{ 'Approved' if current_user.is_verified else 'Pending approval' }}</h2>
+        <p>{{ current_user.email or 'No email added' }}</p>
+        <span class="glass-badge">{{ '✓ PAYCOM approved' if current_user.is_verified else 'Review pending' }}</span>
+      </div>
+      <div class="panel limits-panel">
+        <div class="panel-head"><h3>Account limits</h3><span>Japan</span></div>
+        <p>Email verified level</p><b>¥10,000 – ¥500,000</b>
+        <div class="meter"><i style="width:50%"></i></div>
+        <p>Approved ID level</p><b>¥510,000 – ¥1,000,000</b>
+        <div class="meter purple"><i style="width:100%"></i></div>
+      </div>
+      <div class="panel verification-panel">
+        <div class="panel-head"><h3>Verification</h3><span>Security</span></div>
+        <div class="verify-line"><span>Email</span>{% if profile.email_verified %}<b class="ok">✓ Verified</b>{% else %}<a href="{{url_for('verify_email')}}">Verify now →</a>{% endif %}</div>
+        <div class="verify-line"><span>Identity</span><b class="{{'ok' if profile.identity_status=='APPROVED' else ''}}">{{ profile.identity_status.replace('_',' ') }}</b></div>
+        {% if profile.identity_status != 'APPROVED' %}<a class="mini-link" href="{{ url_for('identity') }}">Manage identity verification →</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="panel quick-panel">
+      <div class="panel-head"><h3>Quick actions</h3><span>PAYCOM</span></div>
+      <div class="quick-actions">
+        <a href="{{ url_for('receive') }}"><b>↗</b><span>Receive money</span><small>Start a transfer</small></a>
+        <a href="{{ url_for('profile') }}"><b>◎</b><span>Profile</span><small>Avatar & account</small></a>
+        <a href="{{ url_for('identity') }}"><b>⌾</b><span>Identity</span><small>Verification level</small></a>
+        <a href="#transactions"><b>≡</b><span>History</span><small>Track transfers</small></a>
+      </div>
+    </div>
+
+    <div class="panel" id="transactions">
+      <div class="panel-head"><h3>Recent transactions</h3>{% if current_user.is_verified and profile.email_verified %}<a href="{{url_for('receive')}}">+ New transaction</a>{% endif %}</div>
+      <div class="transaction-list">
+      {% for t in txns %}
+        <a class="txn-row" href="{{ url_for('transaction_detail',tx_id=t.id) }}">
+          <div class="txn-icon">↗</div>
+          <div><b>{{ t.country }}</b><small class="mono">{{ t.reference }}</small></div>
+          <div class="txn-amount">{{ t.currency }} {{ '{:,.2f}'.format(t.expected_amount) }}</div>
+          <span class="status {{'good' if t.status=='COMPLETED' else ''}}">{{ t.status.replace('_',' ') }}</span>
+        </a>
+      {% else %}
+        <div class="empty-state"><b>No transactions yet</b><p>Your transfers will appear here after you create one.</p></div>
+      {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
 {% endblock %}

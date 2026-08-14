@@ -1,7 +1,50 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pay.com Operations</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}"></head><body><div class="admin">
-<div class="row"><div><div class="eyebrow">PAY.COM ADMIN</div><h1>Operations</h1></div><a class="btn" style="width:130px" href="{{url_for('logout')}}">Logout</a></div>
-<h2>ID review queue</h2>{% if pending_ids %}<div class="tablewrap"><table><tr><th>Customer</th><th>Email</th><th>Status</th><th></th></tr>{% for p in pending_ids %}{% set u=p.user %}<tr><td>{{u.full_name}}</td><td>{{u.email}}</td><td>{{p.identity_status}}</td><td><a class="btn" style="margin:0;width:auto;padding:8px 12px" href="{{url_for('admin_identity',user_id=u.id)}}">Review ID</a></td></tr>{% endfor %}</table></div>{% else %}<div class="card"><p>No ID documents waiting for review.</p></div>{% endif %}
-<h2>Users</h2><div class="tablewrap"><table><tr><th>Name</th><th>Phone/Login</th><th>Email</th><th>Account</th><th>ID</th><th>Actions</th></tr>
-{% for u in users %}{% set p=profiles.get(u.id) %}<tr><td>{{u.full_name}}</td><td>{{u.phone}}</td><td>{{u.email or '—'}}<br>{% if p and p.email_verified %}<span class="badge-verified">Verified</span>{% else %}<span class="status">Unverified</span>{% endif %}</td><td>{{'Approved' if u.is_verified else 'Pending'}}</td><td>{{p.identity_status if p else '—'}}</td><td>{% if u.role!='admin' %}{% if not u.is_verified %}<form method="post" action="{{url_for('admin_verify_user',user_id=u.id)}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button style="margin:0;padding:8px">Approve account</button></form>{% else %}<form method="post" action="{{url_for('admin_unverify_user',user_id=u.id)}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="secondary" style="margin:0;padding:8px">Pause account</button></form>{% endif %}{% if p and p.identity_status!='NOT_SUBMITTED' %}<a class="btn ghost" style="padding:8px" href="{{url_for('admin_identity',user_id=u.id)}}">ID</a>{% endif %}{% endif %}</td></tr>{% endfor %}</table></div>
-<h2>Transactions</h2><div class="tablewrap"><table><tr><th>Reference</th><th>Customer</th><th>Route</th><th>Amount</th><th>Status</th><th></th></tr>{% for t in txns %}<tr><td class="mono">{{t.reference}}</td><td>{{t.user.full_name}}</td><td>{{t.country}}</td><td>{{t.currency}} {{t.expected_amount}}</td><td>{{t.status}}</td><td><a class="btn" style="margin:0;padding:8px;width:auto" href="{{url_for('admin_transaction',tx_id=t.id)}}">Open</a></td></tr>{% endfor %}</table></div>
-</div></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PAYCOM Admin</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}"></head>
+<body class="admin-body">
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="side-brand"><img src="{{url_for('static',filename='img/paycom-logo.png')}}"><b>PAYCOM</b></div>
+    <small>OPERATIONS</small>
+    <a class="active" href="{{url_for('admin_dashboard')}}">▦ Dashboard</a>
+    <a href="#users">♙ Users</a>
+    <a href="#transactions">↗ Transactions</a>
+    <a href="#verification">✓ Verification</a>
+    <a href="{{url_for('logout')}}">⇥ Log out</a>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-top"><div><div class="section-kicker">PAYCOM OPERATIONS</div><h1>Dashboard</h1></div><div class="admin-chip">● Admin</div></div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><small>Total users</small><strong>{{ users|length }}</strong><span>Registered accounts</span></div>
+      <div class="stat-card"><small>Total transactions</small><strong>{{ txns|length }}</strong><span>All transfer records</span></div>
+      <div class="stat-card"><small>Pending IDs</small><strong>{{ pending_ids|length }}</strong><span>Awaiting review</span></div>
+      <div class="stat-card"><small>Completed</small><strong>{{ txns|selectattr('status','equalto','COMPLETED')|list|length }}</strong><span>Finished payouts</span></div>
+    </div>
+
+    <section class="admin-panel" id="verification">
+      <div class="panel-head"><div><h3>ID review queue</h3><p>Identity documents waiting for an administrator.</p></div><span class="count-badge">{{pending_ids|length}} pending</span></div>
+      {% if pending_ids %}
+      <div class="tablewrap"><table><tr><th>Customer</th><th>Email</th><th>Status</th><th>Action</th></tr>
+      {% for p in pending_ids %}{% set u=p.user %}<tr><td><b>{{u.full_name}}</b></td><td>{{u.email}}</td><td><span class="status">{{p.identity_status}}</span></td><td><a class="table-btn" href="{{url_for('admin_identity',user_id=u.id)}}">Review ID</a></td></tr>{% endfor %}</table></div>
+      {% else %}<div class="empty-state"><b>Queue clear</b><p>No ID documents are waiting for review.</p></div>{% endif %}
+    </section>
+
+    <section class="admin-panel" id="users">
+      <div class="panel-head"><div><h3>Users</h3><p>Account, email and identity status.</p></div></div>
+      <div class="tablewrap"><table><tr><th>Name</th><th>Phone / Login</th><th>Email</th><th>Account</th><th>ID</th><th>Actions</th></tr>
+      {% for u in users %}{% set p=profiles.get(u.id) %}<tr>
+        <td><b>{{u.full_name}}</b></td><td>{{u.phone}}</td>
+        <td>{{u.email or '—'}}<br>{% if p and p.email_verified %}<span class="badge-verified">Verified</span>{% else %}<span class="status">Unverified</span>{% endif %}</td>
+        <td>{{'Approved' if u.is_verified else 'Pending'}}</td><td>{{p.identity_status if p else '—'}}</td>
+        <td class="actions">{% if u.role!='admin' %}{% if not u.is_verified %}<form method="post" action="{{url_for('admin_verify_user',user_id=u.id)}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="table-btn" type="submit">Approve</button></form>{% else %}<form method="post" action="{{url_for('admin_unverify_user',user_id=u.id)}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="table-btn subtle" type="submit">Pause</button></form>{% endif %}{% if p and p.identity_status!='NOT_SUBMITTED' %}<a class="table-btn subtle" href="{{url_for('admin_identity',user_id=u.id)}}">ID</a>{% endif %}{% endif %}</td>
+      </tr>{% endfor %}</table></div>
+    </section>
+
+    <section class="admin-panel" id="transactions">
+      <div class="panel-head"><div><h3>Transactions</h3><p>Open any transfer to manage receiving details, receipts and payout.</p></div></div>
+      <div class="tablewrap"><table><tr><th>Reference</th><th>Customer</th><th>Route</th><th>Amount</th><th>Status</th><th></th></tr>
+      {% for t in txns %}<tr><td class="mono">{{t.reference}}</td><td><b>{{t.user.full_name}}</b></td><td>{{t.country}} → Nigeria</td><td>{{t.currency}} {{t.expected_amount}}</td><td><span class="status {{'good' if t.status=='COMPLETED' else ''}}">{{t.status.replace('_',' ')}}</span></td><td><a class="table-btn" href="{{url_for('admin_transaction',tx_id=t.id)}}">Open</a></td></tr>{% endfor %}</table></div>
+    </section>
+  </main>
+</div>
+</body></html>

@@ -1,7 +1,57 @@
-{% extends 'base.html' %}{% block content %}
-<div class="motion-hero"><div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div>
-<div class="eyebrow">INTERNATIONAL RECEIVING</div><div class="motion-logo">Pay<span>.com</span></div>
-<p class="motion-sub">Receive money from abroad with transaction-specific receiving details, verification and transparent payout tracking.</p>
-<div class="motion-card"><div class="mini">SUPPORTED</div><b>JP · US · TW</b><div class="mini">→ Nigeria</div></div></div>
-{% if current_user.is_authenticated %}<a class="btn" href="{{url_for('dashboard')}}">Open Pay.com</a>{% else %}<a class="btn" href="{{url_for('login')}}">Sign in</a><a class="btn secondary" href="{{url_for('register')}}">Create account</a>{% endif %}
+{% extends 'base.html' %}
+{% block title %}PAYCOM — International Money Transfer{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <div class="pill">FAST • SECURE • RELIABLE</div>
+    <h1>Receive money <span>across borders.</span></h1>
+    <p>PAYCOM gives you a guided way to receive international transfers from supported countries, verify payment and track your Nigerian payout from one secure account.</p>
+    <div class="hero-actions">
+      {% if current_user.is_authenticated %}
+        <a class="btn primary" href="{{ url_for('dashboard') }}">Open dashboard</a>
+      {% else %}
+        <a class="btn primary" href="{{ url_for('register') }}">Get started</a>
+        <a class="btn outline" href="{{ url_for('login') }}">Log in</a>
+      {% endif %}
+    </div>
+    <div class="trust-row" id="security">
+      <div><b>🔐</b><span><strong>Protected</strong>Encrypted sensitive documents</span></div>
+      <div><b>✓</b><span><strong>Verified</strong>Email and identity checks</span></div>
+      <div><b>↗</b><span><strong>Tracked</strong>Clear transaction status</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="globe">
+      <img src="{{ url_for('static', filename='img/paycom-logo.png') }}" alt="">
+      <i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+    </div>
+    <div class="floating-card fc1"><small>SUPPORTED ROUTES</small><b>Japan • US • Taiwan</b><span>to Nigeria</span></div>
+    <div class="floating-card fc2"><small>PAYCOM STATUS</small><b>Track every step</b><span>from receiving details to payout</span></div>
+  </div>
+</section>
+
+<section class="transfer-panel">
+  <div>
+    <div class="section-kicker">TRANSFER FLOW</div>
+    <h2>Simple from start to payout</h2>
+  </div>
+  <div class="route-preview">
+    <div><small>Sender location</small><strong>Japan / US / Taiwan</strong></div>
+    <span class="swap">⇄</span>
+    <div><small>Payout destination</small><strong>🇳🇬 Nigeria</strong></div>
+  </div>
+</section>
+
+<section class="feature-grid" id="how">
+  <article class="feature"><span>01</span><h3>Create & verify</h3><p>Open your account, verify your email and complete ID verification when your transfer level requires it.</p></article>
+  <article class="feature"><span>02</span><h3>Create a transaction</h3><p>Select the supported sending country and amount. PAYCOM creates a unique reference for the transfer.</p></article>
+  <article class="feature"><span>03</span><h3>Follow receiving instructions</h3><p>Use the transaction-specific receiving details supplied for that payment and upload your receipt.</p></article>
+  <article class="feature"><span>04</span><h3>Receive your payout</h3><p>After payment verification, submit your Nigerian bank details and follow the payout status to completion.</p></article>
+</section>
+
+<footer class="footer">
+  <div class="brand-lockup"><img src="{{ url_for('static', filename='img/paycom-logo.png') }}" alt=""><span>PAYCOM</span></div>
+  <p>International receiving, verification and payout tracking in one place.</p>
+  <small>PAYCOM • Fast • Secure • Reliable</small>
+</footer>
 {% endblock %}

@@ -292,53 +292,50 @@ def ensure_admin():
 def send_verification_email(user, code):
     if not user.email:
         raise RuntimeError("No email address is set on the account.")
+
     if os.getenv("EMAIL_TEST_MODE", "0") == "1":
         app.logger.warning("EMAIL_TEST_MODE code for %s: %s", user.email, code)
         return
-        api_key = os.getenv("RESEND_API_KEY","").strip()
-        if not api_key:
-            raise RuntimeError("RESEND_API_KEY IS not configured.")
-            sender = os.getenv("RESEND_FROM","onboarding@resend.dev").strip()
-            payload = {
-                "from": sender,
-                "to": [user.email],
-                "subject": "Your pay.com verification code",
-                "text": f"Your pay.com verification code is {code}. The code expires in 10 minutes."
-            }
-            response = request.post(
-                "https://api.resend.com/emails", headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "content-Type": "application/json",
-                },
-                json=payload,
-                timeout=20,
-            )
-         if not response.ok: raise  RuntimeError("Resend email failed")
-        return
 
-    host = os.getenv("SMTP_HOST", "").strip()
-    username = os.getenv("SMTP_USER", "").strip()
-    password = os.getenv("SMTP_PASSWORD", "")
-    sender = os.getenv("SMTP_FROM", username).strip()
-    port = int(os.getenv("SMTP_PORT", "587"))
+    api_key = os.getenv("RESEND_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("RESEND_API_KEY is not configured.")
 
-    if not host or not username or not password or not sender:
-        raise RuntimeError("Email delivery is not configured.")
+    sender = os.getenv("RESEND_FROM", "Pay.com <onboarding@resend.dev>").strip()
 
-    msg = EmailMessage()
-    msg["Subject"] = "Your Pay.com verification code"
-    msg["From"] = sender
-    msg["To"] = user.email
-    msg.set_content(
-        f"Your Pay.com verification code is {code}.\n\n"
-        "The code expires in 10 minutes. If you did not request it, ignore this message."
+    payload = {
+        "from": sender,
+        "to": [user.email],
+        "subject": "Your Pay.com verification code",
+        "html": f"""
+        <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:24px;">
+            <div style="font-size:28px;font-weight:800;margin-bottom:16px;">
+                Pay<span style="color:#2563eb;">.com</span>
+            </div>
+            <p style="font-size:16px;color:#344054;">Your verification code is:</p>
+            <div style="font-size:34px;font-weight:800;letter-spacing:7px;color:#101828;margin:22px 0;">
+                {code}
+            </div>
+            <p style="color:#667085;">This code expires in 10 minutes.</p>
+            <p style="color:#667085;">If you did not request this code, you can ignore this email.</p>
+        </div>
+        """,
+    }
+
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=20,
     )
 
-    context = ssl.create_default_context()
-    with smtplib.SMTP(host, port, timeout=20) as server:
-        server.starttls(context=context)
-        server.login(username, password)
-        server.send_message(msg)
+    if not response.ok:
+        raise RuntimeError(f"Resend email failed: {response.status_code} {response.text}")
+
+    return
 
 def create_and_send_email_code(user):
     profile = get_profile(user)
